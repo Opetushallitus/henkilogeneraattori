@@ -77,21 +77,17 @@ public class HenkiloGenerator {
         if (maxAesKeySize <= 128) {
             throw new RuntimeException("Max AES key size: " + maxAesKeySize + ". Oletko asentanut \"Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files\"?");
         }
-        String aesKey = AES_KEY,
-                aesSalt = AES_SALT,
-                shaSalt = SHA_SALT;
 
-        int generoitavienHetujenMaara = GENEROITTAVIEN_HETUJEN_MAARA;
-        boolean onlyUniqueHetus = ONLY_UNIQUE_HETUS;
-        if (args.length == 5) {
-            aesKey = args[2];
-            aesSalt = args[3];
-            shaSalt = args[4];
-        }
-        if(args.length > 0 && args[0] != null) generoitavienHetujenMaara = Integer.parseInt(args[0]);
-        if(args.length > 0 && args[1] != null) onlyUniqueHetus = Boolean.parseBoolean(args[1]);
+        int generoitavienHetujenMaara = Integer.parseInt(args[0]),
+                minBirthYear = Integer.parseInt(args[1]),
+                maxBirthYear = Integer.parseInt(args[2]);
+
+        String aesKey = args[3],
+                aesSalt = args[4],
+                shaSalt = args[5];
+
         final HenkiloGenerator henkiloGenerator = new HenkiloGenerator(aesKey, aesSalt, shaSalt);
-        henkiloGenerator.generate(generoitavienHetujenMaara, onlyUniqueHetus);
+        henkiloGenerator.generate(generoitavienHetujenMaara, minBirthYear, maxBirthYear);
     }
 
     public HenkiloGenerator(final String aesKey, final String aesSalt, final String shaSalt) throws Exception {
@@ -100,17 +96,16 @@ public class HenkiloGenerator {
         FileUtils.deleteQuietly(output);
     }
 
-    public void generate(final int generoitavienHetujenMaara, boolean onlyUniqueHetus) throws Exception {
+    public void generate(final int generoitavienHetujenMaara, final int minBirthYear, final int maxBirthYear) throws Exception {
         System.out.println("Aloitus: " + new Date());
         System.out.println("Generoitavien henkilöiden määrä: " + generoitavienHetujenMaara);
         int generoidut = 0;
         while (generoidut < generoitavienHetujenMaara) {
-            FileUtils.writeStringToFile(output, new RandomHenkilo(onlyUniqueHetus).toString() + "\n", true);
+            FileUtils.writeStringToFile(output, new RandomHenkilo(minBirthYear, maxBirthYear).toString() + "\n", true);
             generoidut++;
             if(generoidut % 50000 == 0) {
                 int percentage = (generoidut * 100 / generoitavienHetujenMaara);
                 System.out.println(String.format("Henkilöitä generoitu: %s (%s%%, maxRetry: %s, retryCount: %s)", generoidut, percentage, maxRetry, retryCount));
-                //System.out.println("Henkilöitä generoitu: " + generoidut + " (" + percentage + "%)");
             }
         }
         System.out.println("Henkilöitä generoitiin yhteensä: " + generoidut);
@@ -121,19 +116,17 @@ public class HenkiloGenerator {
         return arvot[new SecureRandom().nextInt(arvot.length)];
     }
 
-    private int birthYears[] = {1914, 1915, 1916, 1917, 1918, 1919};
-    
     // Montako kertaa henkilölle on enimmillään jouduttu generoimaan hetu
     private int maxRetry = 0;
     // Montako kertaa henkilöitä luodessa hetu on jouduttu generoimaan uudelleen kosks se ei ole uniikki
     private int retryCount = 0;
     private Set<String> generatedHetus = new HashSet<>();
-    private String generateUniqueHetu() {
+    private String generateUniqueHetu(final int minBirthYear, final int maxBirthYear) {
         int count = 0;
         boolean isUnique = false;
         String hetu = null;
         while(!isUnique) {
-            hetu = HetuUtils.generateHetu(birthYears);
+            hetu = HetuUtils.generateHetu(minBirthYear, maxBirthYear);
             if(count > 1) retryCount++;
             count++;
             if(count > maxRetry) maxRetry = count;
@@ -161,7 +154,7 @@ public class HenkiloGenerator {
         String hetu_sha;
         String sukupuoli;
 
-        public RandomHenkilo(boolean onlyUniqueHetus) {
+        public RandomHenkilo(final int minBirthYear, final int maxBirthYear) {
             this.toinennimi = getRandomValue(toisetnimet);
             this.sukunimi = String.format("%s-%s", getRandomValue(sukunimet), "Testi");
 
@@ -169,7 +162,7 @@ public class HenkiloGenerator {
             this.sahkopostiosoite = String.format("hakija-%d@oph.fi", new SecureRandom().nextInt(2000000) * 31);
             this.puhelinnumero = String.format("050 %s", StringUtils.rightPad("" + new SecureRandom().nextInt(9999999) + 1, 7, '0'));
 
-            final String hetu = onlyUniqueHetus ? generateUniqueHetu() : HetuUtils.generateHetu();
+            final String hetu = generateUniqueHetu(minBirthYear, maxBirthYear);
             this.hetu = hetu;
             this.hetu_aes = aesEncrypter.encrypt(hetu);
             this.hetu_sha = sha2Encrypter.encrypt(hetu);

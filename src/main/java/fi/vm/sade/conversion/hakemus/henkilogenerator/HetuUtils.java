@@ -25,25 +25,13 @@ public final class HetuUtils {
     private HetuUtils() {
     }
 
-    public static String generateHetu() {
-        final Calendar now = Calendar.getInstance();
-        final int currentYear = now.get(Calendar.YEAR);
-        final int startYear = 1920;
-        final Random rand = new Random();
-        final int day = rand.nextInt(28) + 1;
-        final int month = rand.nextInt(12) + 1;
-        final int year = startYear + rand.nextInt(currentYear - startYear);
-        final int gender = rand.nextInt(2); // 0 = female, 1 = male
-        return generateHetuWithArgs(day, month, year, gender);
-    }
-
-    public static String generateHetu(final int[] possibleBirthYears) {
+    public static String generateHetu(final int minBirthYear, final int maxBirthYear) {
         final Calendar now = Calendar.getInstance();
         final int currentYear = now.get(Calendar.YEAR);
         final Random rand = new Random();
         final int day = rand.nextInt(28) + 1;
         final int month = rand.nextInt(12) + 1;
-        final int year = possibleBirthYears[rand.nextInt(possibleBirthYears.length)];
+        final int year = minBirthYear + rand.nextInt(maxBirthYear - minBirthYear + 1);
         final int gender = rand.nextInt(2); // 0 = female, 1 = male
         return generateHetuWithArgs(day, month, year, gender);
     }
