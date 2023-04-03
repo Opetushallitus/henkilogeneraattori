@@ -154,7 +154,7 @@ public class HenkiloGenerator {
         String hetu_sha;
         String sukupuoli;
 
-        public RandomHenkilo(final int minBirthYear, final int maxBirthYear) {
+        public RandomHenkilo(final int minBirthYear, final int maxBirthYear) throws Exception {
             this.toinennimi = getRandomValue(toisetnimet);
             this.sukunimi = String.format("%s-%s", getRandomValue(sukunimet), "Testi");
 
@@ -168,8 +168,12 @@ public class HenkiloGenerator {
             this.hetu_sha = sha2Encrypter.encrypt(hetu);
             if (hetu.charAt(6) == 'A') {
                 this.syntymaaika = String.format("%s.%s.20%s", hetu.substring(0, 2), hetu.substring(2, 4), hetu.substring(4, 6));
-            } else {
+            } else if (hetu.charAt(6) == '-') {
                 this.syntymaaika = String.format("%s.%s.19%s", hetu.substring(0, 2), hetu.substring(2, 4), hetu.substring(4, 6));
+            } else if (hetu.charAt(6) == '+') {
+                this.syntymaaika = String.format("%s.%s.18%s", hetu.substring(0, 2), hetu.substring(2, 4), hetu.substring(4, 6));
+            } else {
+                throw new Exception("Ei järkevä hetu");
             }
             this.sukupuoli = CharUtils.toIntValue(hetu.charAt(9)) % 2 == 0 ? "2" : "1";
             this.etunimi = this.sukupuoli.equals("1") ? getRandomValue(etunimet_miehet) : getRandomValue(etunimet_naiset);
