@@ -1,6 +1,5 @@
 package fi.vm.sade.conversion.hakemus.henkilogenerator;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -8,18 +7,12 @@ import java.util.*;
 
 public final class HetuUtils {
     private static final String CHECKSUM_CHARACTERS = "0123456789ABCDEFHJKLMNPRSTUVWXY";
-    private static volatile Map<Integer, Character> separators = new HashMap<Integer, Character>();
-    private static volatile Map<Character, Integer> invertedSeparators = new HashMap<Character, Integer>();
+    public static volatile Map<Integer, List<Character>> separators = new HashMap<Integer, List<Character>>();
 
     static {
-        separators.put(18, '+');
-        separators.put(19, '-');
-        separators.put(20, 'A');
-        separators.put(21, 'B');
-
-        @SuppressWarnings("unchecked")
-        final Map<Character, Integer> inverted = MapUtils.invertMap(separators);
-        invertedSeparators = inverted;
+        separators.put(18, Arrays.asList('-'));
+        separators.put(19, Arrays.asList('Y', 'X', 'W', 'V', 'U'));
+        separators.put(20, Arrays.asList('B', 'C', 'D', 'E', 'F'));
     }
 
     private HetuUtils() {
@@ -32,11 +25,13 @@ public final class HetuUtils {
         final int day = rand.nextInt(28) + 1;
         final int month = rand.nextInt(12) + 1;
         final int year = minBirthYear + rand.nextInt(maxBirthYear - minBirthYear + 1);
+        final List<Character> separatorsAvailable = separators.get(Integer.parseInt(StringUtils.substring(String.valueOf(year), 0, 2)));
+        final Character separator = separatorsAvailable.get(rand.nextInt(separatorsAvailable.size()));
         final int gender = rand.nextInt(2); // 0 = female, 1 = male
-        return generateHetuWithArgs(day, month, year, gender);
+        return generateHetuWithArgs(day, month, year, gender, separator);
     }
 
-    private  static String generateHetuWithArgs(final int day, final int month, final int year, final int gender) {
+    private  static String generateHetuWithArgs(final int day, final int month, final int year, final int gender, final Character separator) {
         try {
             final SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
             sdf.parse(String.format("%s%s%s",
@@ -64,7 +59,7 @@ public final class HetuUtils {
                 StringUtils.leftPad(String.valueOf(day), 2, '0'),
                 StringUtils.leftPad(String.valueOf(month), 2, '0'),
                 StringUtils.substring(String.valueOf(year), 2),
-                separators.get(Integer.parseInt(StringUtils.substring(String.valueOf(year), 0, 2))),
+                separator,
                 StringUtils.leftPad(String.valueOf(identifier), 3, '0'));
         final char checksumCharacter = getChecksumCharacter(partialHetu);
 
