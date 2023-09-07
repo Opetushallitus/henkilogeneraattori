@@ -10,7 +10,7 @@ public final class HetuUtils {
     private static volatile Map<Integer, List<Character>> separators = new HashMap<Integer, List<Character>>();
 
     static {
-        separators.put(18, Arrays.asList('-'));
+        separators.put(18, Arrays.asList('+'));
         separators.put(19, Arrays.asList('Y', 'X', 'W', 'V', 'U'));
         separators.put(20, Arrays.asList('B', 'C', 'D', 'E', 'F'));
     }
