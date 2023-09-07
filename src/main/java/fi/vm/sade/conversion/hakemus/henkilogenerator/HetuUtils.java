@@ -19,8 +19,6 @@ public final class HetuUtils {
     }
 
     public static String generateHetu(final int minBirthYear, final int maxBirthYear) {
-        final Calendar now = Calendar.getInstance();
-        final int currentYear = now.get(Calendar.YEAR);
         final Random rand = new Random();
         final int day = rand.nextInt(28) + 1;
         final int month = rand.nextInt(12) + 1;
@@ -41,8 +39,10 @@ public final class HetuUtils {
         } catch (final Exception e) {
             throw new IllegalArgumentException("error parsing birthday", e);
         }
+        final Calendar now = Calendar.getInstance();
+        final int currentYear = now.get(Calendar.YEAR);
 
-        if (year < 1800 || year > 2199) {
+        if (year < currentYear - 99 || year > currentYear) {
             throw new IllegalArgumentException("year is invalid");
         }
 
