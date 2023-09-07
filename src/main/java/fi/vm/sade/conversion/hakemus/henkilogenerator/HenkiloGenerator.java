@@ -166,9 +166,9 @@ public class HenkiloGenerator {
             this.hetu = hetu;
             this.hetu_aes = aesEncrypter.encrypt(hetu);
             this.hetu_sha = sha2Encrypter.encrypt(hetu);
-            if (hetu.charAt(6) == 'A') {
+            if (hetu.charAt(6) == 'A' || hetu.charAt(6) == 'B' || hetu.charAt(6) == 'C' || hetu.charAt(6) == 'D' || hetu.charAt(6) == 'E' || hetu.charAt(6) == 'F') {
                 this.syntymaaika = String.format("%s.%s.20%s", hetu.substring(0, 2), hetu.substring(2, 4), hetu.substring(4, 6));
-            } else if (hetu.charAt(6) == '-') {
+            } else if (hetu.charAt(6) == '-' || hetu.charAt(6) == 'Y' || hetu.charAt(6) == 'X' || hetu.charAt(6) == 'W' || hetu.charAt(6) == 'V' || hetu.charAt(6) == 'U') {
                 this.syntymaaika = String.format("%s.%s.19%s", hetu.substring(0, 2), hetu.substring(2, 4), hetu.substring(4, 6));
             } else if (hetu.charAt(6) == '+') {
                 this.syntymaaika = String.format("%s.%s.18%s", hetu.substring(0, 2), hetu.substring(2, 4), hetu.substring(4, 6));
