@@ -7,7 +7,7 @@ import java.util.*;
 
 public final class HetuUtils {
     private static final String CHECKSUM_CHARACTERS = "0123456789ABCDEFHJKLMNPRSTUVWXY";
-    public static volatile Map<Integer, List<Character>> separators = new HashMap<Integer, List<Character>>();
+    private static volatile Map<Integer, List<Character>> separators = new HashMap<Integer, List<Character>>();
 
     static {
         separators.put(18, Arrays.asList('-'));
